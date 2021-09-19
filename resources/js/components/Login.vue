@@ -53,17 +53,6 @@
             submit() {
                 this.login({ ...this.credentials })
                     .then(() => {
-
-                        axios.get('api/v1/cart/restore',
-                            {
-                                headers: {
-                                    "Authorization": `Bearer ${this.$store.state.authModule.accessToken}`
-                                }
-                            }).then((cartResponse) => {
-                            this.$store
-                                .dispatch('setCart', cartResponse.data);
-                        });
-
                         this.$router.push({name: 'home'});
                     })
                     .catch((errors) => {

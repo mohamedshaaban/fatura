@@ -32,6 +32,45 @@ class AuthController extends Controller {
      * @return JsonResponse [string] message
      */
 
+    public function register( Request $request )
+    {
+        $request->validate( [
+            'username'       => 'required|string',
+            'password'    => 'required|string',
+            'role'    => 'required',
+         ] );
+
+
+        $user = User::create([
+            'username'=>$request->username,
+            'name'=>$request->username,
+            'password'=>bcrypt($request->password)
+        ]);
+
+        $credentials = request( ['username', 'password'] );
+
+        if ( Auth::attempt( $credentials ) )
+        {
+            $user = $request->user();
+            $tokenResult = $user->createToken( 'Personal Access Token' );
+
+            $token =$tokenResult->accessToken->token;
+
+
+            return response()->json( [
+                'access_token' => $token,
+                'token_type'   => 'Bearer',
+                'expires_at'   => Carbon::parse(
+                    $tokenResult->accessToken->expires_at
+                )->toDateTimeString()
+            ] );
+        }
+
+        return response()->json( [
+            'message' => 'Your account is not exists yet!'
+        ], 422 );
+
+    }
     public function login( Request $request )
     {
         $request->validate( [
@@ -46,9 +85,6 @@ class AuthController extends Controller {
                 'message' => 'Unauthorized'
             ], 401 );
         }
-
-
-
         if ( Auth::attempt( $credentials )->user() )
         {
             $user = Auth::attempt( $credentials )->user();

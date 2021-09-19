@@ -1,4 +1,6 @@
 import Login  from "./components/Login";
+import Register  from "./components/Register";
+import Home  from "./components/Home";
 
 import Router from 'vue-router'
 import Vue from "vue";
@@ -12,26 +14,21 @@ export default {
     routes: [
 
         {
+            path: '/home',
+            name: 'home',
+            component: Home
+        },
+        {
             path: '/login',
             name: 'login',
             component: Login
+        },
+        {
+            path: '/register',
+            name: 'register',
+            component: Register
         }
     ]
 }
 
-// router.beforeEach((to, from, next) => {
-//
-//     // use the language from the routing param or default language
-//     let language = to.params.lang;
-//     if (!language) {
-//         language = 'en';
-//     }
-//
-//     // set the current language for vuex-i18n. note that translation data
-//     // for the language might need to be loaded first
-//     Vue.i18n.set(language);
-//     next();
-//
-// });
 
-// export default routes
