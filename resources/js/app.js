@@ -1,36 +1,64 @@
-import Vuetify from "vuetify";
-
-require('./bootstrap');
 import Vue from 'vue';
 import VueRouter from 'vue-router';
+import routes from './routes';
+import store from './store';
 import VueAxios from 'vue-axios';
-import routes from "./routes";
-import $ from 'jquery';
-import axios from 'axios';
 
-import App from './app.vue';
+import Layout from "./components/Layout";
+import Login from "./components/Login";
 
- Vue.use(VueRouter);
-Vue.use(VueAxios, axios);
 
 window.axios = require('axios');
 
 
-Vue.use(Vuetify);
+Vue.use(VueRouter)
 
 
 
-const lang = document.documentElement.lang.substr(0, 2);
 // or however you determine your current app locale
-const i18n = new VueInternationalization({
-    fallbackLocale: 'en',
-    locale: lang,
-    messages: Locale
+
+let app = new Vue({
+    el: '#app',
+    store,
+    components: {
+        Layout
+    },
+    mounted: function(){
+
+    },
+    created () {
+
+
+    },
+
+    router: new VueRouter(routes)
 });
 
-const app = new Vue({
-    el: '#app',
-    i18n,
-    components: { App,Footer, Header },
-    router: new VueRouter(routes),
-});
+axios.interceptors.request.use(
+    (requestConfig) => {
+        if (store.getters['authModule/isAuthenticated']) {
+            // console.log('sending authorization');
+            // console.log(store.state.authModule.accessToken);
+            requestConfig.headers.Authorization = `Bearer ${store.state.authModule.accessToken}`;
+        }else{
+            console.log('No authorization');
+        }
+
+        // requestConfig.headers.xLocalization = this.$store.state.langModule.lang;
+
+        return requestConfig;
+    },
+    (requestError) => Promise.reject(requestError),
+);
+
+axios.interceptors.response.use(
+    response => response,
+    (error) => {
+        if (error.response.status === 401 ) {
+            // Clear token and redirect
+            store.commit('authModule/setAccessToken', null);
+            // window.location.replace(`${window.location.origin}/login`);
+        }
+        return Promise.reject(error);
+    },
+);

@@ -14,9 +14,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 
+
 Route::group(['middleware' => 'web' ], function() {
+
     Route::get('/{any}', function () {
         return view('app');
-    })->name('app')->where('any', '.*');
-
+    })->where('any', '.*');
 });
