@@ -36,8 +36,7 @@ export const actions = {
      * @param userData {Object} User userData
      * @param userData.email {string} User email
      * @param userData.password {string} User password
-     * @param userData.role {string} User phone
-     */
+      */
     registerUser(context, userData) {
         return axios.post('/api/v1/register', userData)
             .then((response) => {

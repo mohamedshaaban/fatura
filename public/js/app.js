@@ -2075,23 +2075,14 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {};
   },
-  mounted: function mounted() {// axios.all([
-    //     axios.get('/api/home-sliders'),
-    //     axios.get('/api/home-settings'),
-    //     axios.get('/api/meta-settings'),
-    //     axios.get('/api/home-departments'),
-    //     axios.get('/api/home-doctors')
-    // ])
-    // .then(axios.spread((slidersResponse,settingsResponse,metaSettingsResponse,departmentsResponse,doctorsResponse) => {
-    //     this.sliders     = slidersResponse.data;
-    //     this.settings   = settingsResponse.data;
-    //     this.meta_settings   = metaSettingsResponse.data;
-    //     this.departments = departmentsResponse.data;
-    //     this.doctors   = doctorsResponse.data;
-    // })).then((result) => {
-    //     $("#load").hide();
-    //
-    // });
+  mounted: function mounted() {
+    var _this = this;
+
+    axios.all([axios.get('/api/home-menus')]).then(axios.spread(function (menuResponse) {
+      _this.meuns = menuResponse.data;
+    })).then(function (result) {
+      $("#load").hide();
+    });
   },
   computed: {},
   updated: function updated() {
@@ -2504,8 +2495,7 @@ var actions = {
    * @param userData {Object} User userData
    * @param userData.email {string} User email
    * @param userData.password {string} User password
-   * @param userData.role {string} User phone
-   */
+    */
   registerUser: function registerUser(context, userData) {
     return axios__WEBPACK_IMPORTED_MODULE_0___default().post('/api/v1/register', userData).then(function (response) {
       // retrieve access token
