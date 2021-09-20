@@ -1,32 +1,64 @@
-/**
- * First we will load all of this project's JavaScript dependencies which
- * includes Vue and other libraries. It is a great starting point when
- * building robust, powerful web applications using Vue and Laravel.
- */
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+import routes from './routes';
+import store from './store';
+import VueAxios from 'vue-axios';
 
-require('./bootstrap');
+import Layout from "./components/Layout";
+import Login from "./components/Login";
 
-window.Vue = require('vue').default;
 
-/**
- * The following block of code may be used to automatically register your
- * Vue components. It will recursively scan this directory for the Vue
- * components and automatically register them with their "basename".
- *
- * Eg. ./components/ExampleComponent.vue -> <example-component></example-component>
- */
+window.axios = require('axios');
 
-// const files = require.context('./', true, /\.vue$/i)
-// files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
-Vue.component('example-component', require('./components/ExampleComponent.vue').default);
+Vue.use(VueRouter)
 
-/**
- * Next, we will create a fresh Vue application instance and attach it to
- * the page. Then, you may begin adding components to this application
- * or customize the JavaScript scaffolding to fit your unique needs.
- */
 
-const app = new Vue({
+
+// or however you determine your current app locale
+
+let app = new Vue({
     el: '#app',
+    store,
+    components: {
+        Layout
+    },
+    mounted: function(){
+
+    },
+    created () {
+
+
+    },
+
+    router: new VueRouter(routes)
 });
+
+axios.interceptors.request.use(
+    (requestConfig) => {
+        if (store.getters['authModule/isAuthenticated']) {
+            // console.log('sending authorization');
+            // console.log(store.state.authModule.accessToken);
+            requestConfig.headers.Authorization = `Bearer ${store.state.authModule.accessToken}`;
+        }else{
+            console.log('No authorization');
+        }
+
+        // requestConfig.headers.xLocalization = this.$store.state.langModule.lang;
+
+        return requestConfig;
+    },
+    (requestError) => Promise.reject(requestError),
+);
+
+axios.interceptors.response.use(
+    response => response,
+    (error) => {
+        if (error.response.status === 401 ) {
+            // Clear token and redirect
+            store.commit('authModule/setAccessToken', null);
+            // window.location.replace(`${window.location.origin}/login`);
+        }
+        return Promise.reject(error);
+    },
+);
